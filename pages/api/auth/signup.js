@@ -1,7 +1,10 @@
 import { connectToDatabase } from "../../../lib/db";
 import { hashPassword } from "./auth";
 
-function handler(req, res) {
+async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return;
+  }
   const data = req.body;
 
   const { email, password } = data;
@@ -21,7 +24,7 @@ function handler(req, res) {
   
   const db = client.db();
 
-  const hashedPassword = hashPassword(password);
+  const hashedPassword = await hashPassword(password);
   const result = await db.collection('users').insertOne({
     email: email,
     password: hashedPassword,
@@ -31,6 +34,6 @@ function handler(req, res) {
     .json({
       message: "User created!"
     });
-}
+};
 
 export default handler;
